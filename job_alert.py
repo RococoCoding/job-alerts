@@ -49,7 +49,7 @@ def filter_jobs(html):
         company = li.find('h4', class_='base-search-card__subtitle').text.strip()
 
         # Exclude listings with 'Senior' in the title
-        if title_include_pattern and not title_exclude_pattern.search(job_title):
+        if title_include_pattern.search(job_title) and not title_exclude_pattern.search(job_title):
             # Get the link to the job posting
             try:
                 full_url = (li.find('a', class_='base-card--link') or li.find('a', class_='base-card__full-link'))['href']
@@ -60,15 +60,16 @@ def filter_jobs(html):
 
             # Get the actual job posting
             posting_response = requests.get(full_url)
+            print(posting_response)
 
             # parse job posting
-            test_posting = '<div class="show-more-less-html__markup show-more-less-html__markup--clamp-after-5 relative overflow-hidden"> <p>We are seeking entry-level software developers 3 yoe interested in joining our team of innovators and working remotely with us to delve into our application architecture. You will construct applications from the foundation up while also improving an established core. You will be afforded the opportunity to collaborate in compact yet comprehensive teams that possess absolute authority over modules and applications.</p><p><br/></p><p>Duties and obligations:</p><p><br/></p><p>   Develops, tests, debugs, and implements custom applications in C# that utilize microservices techniques and Angular 2+ in a.Net environment.</p><p>   Employs SQL to retrieve, query, and join data when required with TSQL.</p><p>   Potentially integrates multiple components across disparate applications</p><p>   Content creator for technical specifications and additional documentation</p><p>   Innovates processes and instruments that facilitate and accelerate the attainment of development objectives.</p><p>   Works in conjunction with various technical teams (DevOps, Database, QA Testers, Analysts) to guarantee the effective execution of projects, encompassing testing, integration, and deployment.</p><p><br/></p><p><br/></p><p><br/></p><p>Essential Qualifications:</p><p><br/></p><p>   Bachelor\'s degree from an accredited institution in the United States in computer science or a related field.</p><p>   Fundamental expertise in object-oriented technology and contemporary user interfaces, including SQL</p><p>       Software development life cycles, coding standards, code reviews, source control administration, and testing; Agile and waterfall</p><p>   Outstanding written and verbal communication abilities.</p><p><br/></p><p><br/></p><p><br/></p><p><br/></p>'
-            posting_soup = BeautifulSoup(test_posting, 'html.parser')
+            posting_soup = BeautifulSoup(posting_response.text, 'html.parser')
             job_description = posting_soup.find('div', class_='show-more-less-html__markup')
+            print(job_description)
             # Get all the <p> tags
-            p_tags = job_description.find_all('p')
+            li_tags = job_description.find_all('li')
             # Join all the text from the <p> tags
-            posting_text = ' '.join(p_tag.get_text() for p_tag in p_tags)
+            posting_text = ' '.join(li_tag.get_text() for li_tag in li_tags)
             print(posting_text)
             # Define a regex pattern to find mentions of greater than 3 years of experience
             pattern = r'(\d{1,2,3}\+?)(\s|-)*(years|yrs|yoe)'
