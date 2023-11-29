@@ -1,4 +1,7 @@
 import re
+
+tn_base_command = base_command = '/usr/local/Cellar/terminal-notifier/2.0.0/terminal-notifier.app/Contents/MacOS/terminal-notifier'
+
 # region *** search ***
 inclusive_keywords = ['javascript', 'JavaScript', 'Javascript', 'JS']
 exclusive_keywords = [
@@ -15,22 +18,25 @@ linkedin_keywords = f'({joined_inclusive})%20NOT%20({joined_exclusive})'
 linkedin_base_url = 'https://www.linkedin.com'
 
 
-def linkedin_search_url(keywords, time, page):
-    return f'jobs/search?keywords={keywords}&location=United%20States&f_TPR=r{time}&f_T=9%2C25201%2C10%2C3549%2C24%2C25194&position=1&pageNum={page}'
+def linkedin_search_url(time, page):
+    return f'/jobs/search?keywords={linkedin_keywords}&location=United%20States&f_TPR=r{time}&f_T=9%2C25201%2C10%2C3549%2C24%2C25194&position=1&pageNum={page}'
 # endregion
 
 
 # region *** title filter ***
-exclude_seniority = ['senior', 'sr', 'director', 'staff', 'lead', 'architect', 'principal']
-exclude_job_type = ['instructor', 'designer', 'ux', 'marketing', 'security', 'reliability', 'embedded', 'mobile', 'solutions engineer', 'devops', 'front end', 'frontend', 'test automation', 'QA engineer', 'test engineer', 'manufacturing', 'electrical', 'cnc']
-exclude_tech = ['servicenow', 'sharepoint', 'apigee', 'salesforce', 'shopify', 'wordpress', 'android', 'ios', 'c++', 'appian', 'aws', 'drupal', '.net', 'dotnet', 'mulesoft']
+exclude_seniority = ['graduate', 'senior', 'sr', 'director', 'staff', 'lead', 'architect', 'principal']
+exclude_job_type = ['instructor', 'systems engineer', 'sdet', 'designer', 'ux', 'ui', 'marketing', 'security', 'reliability', 'embedded', 'mobile', 'solutions engineer', 'devops', 'front end', 'front-end', 'frontend', 'seo', 'in test', 'test automation', 'QA', 'test engineer', 'manufacturing', 'electrical', 'cnc']
+exclude_tech = ['oracle', 'vmware', 'ai', 'aem', 'llm', 'linux', 'servicenow', 'sharepoint', 'apigee', 'salesforce', 'shopify', 'wordpress', 'android', 'ios', 'c++', 'appian', 'aws', 'drupal', '.net', 'dotnet', 'dot net', 'mulesoft']
 all_title_exclusions = '|'.join(exclude_tech) + '|' + '|'.join(exclude_seniority) + '|' + '|'.join(exclude_job_type)
-title_exclude_pattern = re.compile(r'{}'.format(all_title_exclusions), re.IGNORECASE)
+title_exclude_pattern = re.compile(rf'\b{all_title_exclusions}\b', re.IGNORECASE)
 
 include_title = ['engineer', 'developer', 'programmer']
 all_title_inclusions = '|'.join(include_title)
-title_include_pattern = re.compile(r'{}'.format(all_title_inclusions), re.IGNORECASE)
+title_include_pattern = re.compile(rf'{all_title_inclusions}', re.IGNORECASE)
 
+exclude_location = ['TX', 'AZ', 'GA', 'FL', 'NM', 'LA', 'AL', 'MS', 'NV', 'SC', 'AR']
+all_location_exclusions = '|'.join(exclude_location)
+location_exclude_pattern = re.compile(rf'^(?!.*\bremote\b)(?=.*\b(?:{all_location_exclusions})\b).*$', re.IGNORECASE)
 # endregion
 
 
@@ -38,6 +44,8 @@ title_include_pattern = re.compile(r'{}'.format(all_title_inclusions), re.IGNORE
 time_unit_patterns = 'years|yrs|yoe|yr|y'
 user_min_range = 0
 user_max_range = 4
+# clearance filters
+clearance_filter = re.compile("|".join(['clearance', 'ts/sci', 'top secret']), re.IGNORECASE)
 # if digit + anything + time unit
 experience_base_filter = re.compile(rf'(\d+).*({time_unit_patterns})', re.IGNORECASE)
 # if range of digits + time unit, ex: 2-3 years, 2y-5y
