@@ -1,6 +1,7 @@
 import re
 
 tn_base_command = base_command = '/usr/local/Cellar/terminal-notifier/2.0.0/terminal-notifier.app/Contents/MacOS/terminal-notifier'
+text_spacer = '\n\n\n\n--------------------------------------------------------------------------------------------------------\n\n\n\n'
 
 # region *** search ***
 inclusive_keywords = ['javascript', 'JavaScript', 'Javascript', 'JS']
@@ -25,12 +26,13 @@ def linkedin_search_url(time, page):
 
 # region *** title filter ***
 exclude_seniority = ['graduate', 'senior', 'sr', 'director', 'staff', 'lead', 'architect', 'principal']
-exclude_job_type = ['instructor', 'systems engineer', 'sdet', 'designer', 'ux', 'ui', 'marketing', 'security', 'reliability', 'embedded', 'mobile', 'solutions engineer', 'devops', 'front end', 'front-end', 'frontend', 'seo', 'in test', 'test automation', 'QA', 'test engineer', 'manufacturing', 'electrical', 'cnc']
-exclude_tech = ['oracle', 'vmware', 'ai', 'aem', 'llm', 'linux', 'servicenow', 'sharepoint', 'apigee', 'salesforce', 'shopify', 'wordpress', 'android', 'ios', 'c++', 'appian', 'aws', 'drupal', '.net', 'dotnet', 'dot net', 'mulesoft']
+exclude_job_type = ['instructor', 'firmware', 'field services', 'systems engineer', 'sdet', 'designer', 'ux', 'ui', 'marketing', 'security', 'reliability', 'embedded', 'mobile', 'solutions engineer', 'devops', 'front end', 'front-end', 'frontend', 'seo', 'in test', 'test automation', 'QA', 'test engineer', 'manufacturing', 'electrical', 'cnc']
+exclude_tech = ['oracle', 'vmware', 'blockchain', 'crypto', 'web3', 'nft', 'ai', 'aem', 'llm', 'linux', 'servicenow', 'sharepoint', 'apigee', 'salesforce', 'shopify', 'wordpress', 'android', 'ios', 'c\+\+', 'appian', 'aws', 'drupal', '\.net', 'dotnet', 'dot net', 'mulesoft']
 all_title_exclusions = '|'.join(exclude_tech) + '|' + '|'.join(exclude_seniority) + '|' + '|'.join(exclude_job_type)
+print(all_title_exclusions)
 title_exclude_pattern = re.compile(rf'\b{all_title_exclusions}\b', re.IGNORECASE)
 
-include_title = ['engineer', 'developer', 'programmer']
+include_title = []
 all_title_inclusions = '|'.join(include_title)
 title_include_pattern = re.compile(rf'{all_title_inclusions}', re.IGNORECASE)
 
@@ -41,7 +43,7 @@ location_exclude_pattern = re.compile(rf'^(?!.*\bremote\b)(?=.*\b(?:{all_locatio
 
 
 # region *** description filter ***
-time_unit_patterns = 'years|yrs|yoe|yr|y'
+time_unit_patterns = 'year|years\'|year\'s|years|yrs|yoe|yr|y'
 user_min_range = 0
 user_max_range = 4
 # clearance filters
@@ -49,9 +51,9 @@ clearance_filter = re.compile("|".join(['clearance', 'ts/sci', 'top secret']), r
 # if digit + anything + time unit
 experience_base_filter = re.compile(rf'(\d+).*({time_unit_patterns})', re.IGNORECASE)
 # if range of digits + time unit, ex: 2-3 years, 2y-5y
-experience_range_filter = re.compile(rf'(\d+)\s*(?:y.*)?\s*(?:-|to)\s*(\d+)', re.IGNORECASE)
+experience_range_filter = re.compile(rf'(\d+)\s*(?:y)?\s*(?:-|to)\s*(\d+)\s*(?:y)?\s*(?:y)', re.IGNORECASE)
 # if number+ and time unit, ex: 3+ years, 3y+, 3yoe+
-experience_plus_filter = re.compile(rf'(\d+)(?:y(?:r|rs|oe)?)?\+', re.IGNORECASE)
+experience_plus_filter = re.compile(rf'(\d+)(?:y?)\+\s*(?:y)', re.IGNORECASE)
 # if minimum|min|at least + digit + time unit is mentioned, ex: minimum of 3 years experience
-experience_min_filter = re.compile(rf'(?:minimum|min|at least)\s*(\d+)', re.IGNORECASE)
+experience_min_filter = re.compile(rf'(\d+)\s*(?:y)', re.IGNORECASE)
 # endregion
