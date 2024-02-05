@@ -5,41 +5,50 @@ text_spacer = '\n\n\n\n---------------------------------------------------------
 
 exclude_seniority = ['graduate', 'founding', 'senior', 'sr', 'director', 'staff', 'lead', 'architect', 'principal']
 exclude_job_type = ['instructor', 'webmaster', 'manager', 'research', 'infrastructure', 'quality assurance', 'data scientist', 'data analytics', 'firmware', 'field services', 'systems engineer', 'sdet', 'designer', 'ux', 'ui', 'marketing', 'security', 'reliability', 'embedded', 'mobile', 'solutions engineer', 'devops', 'front end', 'front-end', 'frontend', 'seo', 'in test', 'test automation', 'QA', 'test engineer', 'manufacturing', 'electrical', 'cnc']
-exclude_tech = ['oracle', 'php', 'etl', 'kubernetes', 'redis', 'sap', 'cots', 'idam', 'windows server', 'vr', 'badi', 'plc', 'powerbi', 'awd', 'flutter', 'business intelligence', 'vmware', 'blockchain', 'crypto', 'web3', 'nft', 'ai', 'aem', 'machine learning', 'ml', 'llm', 'linux', 'servicenow', 'sharepoint', 'workday', 'apigee', 'salesforce', 'shopify', 'wordpress', 'android', 'ios', 'c#', 'c\+\+', 'appian', 'aws', 'drupal', '\.net', 'dotnet', 'dot net', 'mulesoft']
-
-# region *** search ***
+exclude_tech = ['oracle', 'php', 'etl', 'kubernetes', 'redis', 'sap', 'cots', 'idam', 'windows server', 'vr', 'badi', 'plc', 'powerbi', 'aws', 'flutter', 'business intelligence', 'vmware', 'blockchain', 'crypto', 'web3', 'nft', 'ai', 'aem', 'machine learning', 'ml', 'llm', 'linux', 'servicenow', 'sharepoint', 'workday', 'apigee', 'salesforce', 'shopify', 'wordpress', 'android', 'ios', 'appian', 'aws', 'drupal', 'dotnet', 'dot net', 'mulesoft']
+regex_special_char_exclusions = ['c#', 'c\+\+', '\.net']
 inclusive_keywords = ['javascript', 'JavaScript', 'Javascript', 'JS']
-exclusive_keywords = [
+
+# region *** linkedin ***
+linkedin_base_url = 'https://www.linkedin.com'
+
+# linkedin has more issues with spammy posts from third-party agencies
+linkedin_exclusive_keywords = [
     '"Get It Recruit"', '"ecocareers"', '"Actalent"', 'jobot',
     '"skyrecruitment"', '"phoenix recruiting"', '"hiremefast"', '"Pattern Learning"',
-    'ClearanceJobs', 'patterned learning', 'clearance', 'Tutor'
+    'ClearanceJobs', '"patterned learning"', 'clearance', 'Tutor'
 ]
 
 # Join inclusive and exclusive keywords into strings
 linkedin_joined_inclusive = '%20OR%20'.join(inclusive_keywords)
-linkedin_joined_exclusive = '%20OR%20'.join(exclusive_keywords)
+linkedin_joined_exclusive = '%20OR%20'.join(linkedin_exclusive_keywords)
 
 # Final result
 linkedin_keywords = f'({linkedin_joined_inclusive})%20NOT%20({linkedin_joined_exclusive})'
-linkedin_base_url = 'https://www.linkedin.com'
 
 
-def linkedin_search_url(time, page):
-    return f'/jobs/search?keywords={linkedin_keywords}&location=United%20States&f_TPR=r{time}&f_T=9%2C25201%2C10%2C3549%2C24%2C25194&position=1&pageNum={page}'
+def linkedin_query(time, count):
+    return f'/jobs/search?keywords={linkedin_keywords}&location=United%20States&f_TPR=r{time}&f_T=9%2C25201%2C10%2C3549%2C24%2C25194&position=1&start={count}'
+# endregion
 
 
+# region *** indeed ***
+indeed_base_url = 'https://www.indeed.com'
+# indeed lets you filter by title
 indeed_keyword_inclusions = '+OR+'.join(inclusive_keywords)
-indeed_title_exclusions = '+OR+'.join(exclude_tech) + '+OR+' + '+OR+'.join(exclude_seniority) + '+OR+' + '+OR+'.join(exclude_job_type)
-# indeed_title_inclusions = '+OR+'.join()
+indeed_inclusive_title_keywords = ['software', 'programmer', 'developer']
+# there's a limit on how long the filter can be for indeed, so shortened exclusions list
+indeed_title_exclusions = ['crypto', 'blockchain', 'web3', 'qa', 'test', 'embedded', 'network', 'cloud', 'frontend', 'php', 'android', 'ios', 'linux', 'sharepoint', 'sailpoint', 'servicenow', 'workday', 'c%2B%2B', '.net', 'c%23']
+indeed_title_exclusions = '+OR+'.join(exclude_seniority) + '+OR+' + '+OR+'.join(indeed_title_exclusions)
+indeed_title_inclusions = '+OR+'.join(indeed_inclusive_title_keywords)
 
 
-def indeed_search_url(time, page):
-    return f'/jobs?q={indeed_keyword_inclusions}+%28title%3A+engineer+OR+developer+OR+programmer+NOT+%28Senior+OR+embedded+OR+appian+OR+TS%2FSCI+OR+lead+OR+sailpoint+OR+principal+OR+devops+OR+wordpress+OR+staff+OR+sharepoint+OR+servicenow+OR+drupal+OR+Sr+OR+Sr.%29%29&l=United+States&sort=date&ts=1701278511095&pts=1701210377180&rq=1&from=HPRecent&rsIdx=0&fromage=last&newcount=267&vjk=7164afa6a7003729'
+indeed_query = f'/jobs?q={indeed_keyword_inclusions}+%28title%3A+{indeed_title_inclusions}+NOT+%28{indeed_title_exclusions}%29%29&l=United+States&sort=date&fromage=1'
 # endregion
 
 
 # region *** title filter ***
-all_title_exclusions = '|'.join(exclude_tech) + '|' + '|'.join(exclude_seniority) + '|' + '|'.join(exclude_job_type)
+all_title_exclusions = '|'.join(exclude_tech) + '|' + '|'.join(regex_special_char_exclusions) + '|' + '|'.join(exclude_seniority) + '|' + '|'.join(exclude_job_type)
 title_exclude_pattern = re.compile(rf'\b{all_title_exclusions}\b', re.IGNORECASE)
 
 include_title = []
