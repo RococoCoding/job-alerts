@@ -3,3 +3,5 @@ job_archives/
 logs/
 database/jobs.db
 venv/
+.vscode/
+*.pyc
