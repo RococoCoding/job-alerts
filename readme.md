@@ -21,4 +21,13 @@ Setup instructions:
 1. Copy this repo to your computer
 2. Cd into your local copy of the repo and initialize a python environment 
 3. Run setup table script in migrations folder to setup database
-4.  /Users/alicechang/Projects/job-alerts/venv/bin/python job_alert.py 900  
+4. [path to python] [path to job_alert.py] [time in seconds age limit for postings]  
+
+Setup Cronjob (Mac):
+1. crontab -e
+2. i (insert/type in vi)
+3. Example: To run every 15 min between 9am and 5pm
+```
+*/15 9-17 * * * [path to python] [path to job_alert.py] [time in seconds age limit for postings]
+```
+4. esc then :wq to save and exit vi
