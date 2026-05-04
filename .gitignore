@@ -2,3 +2,4 @@
 job_archives/
 logs/
 database/jobs.db
+venv/
